@@ -29,15 +29,6 @@ class MoneyLine():
         print("payout:" , self.payout)
         print("=========================")
 
-
-
-# giants = MoneyLine(event="giants", bet_amount=100, odds=-150)
-# dolphins = MoneyLine(event="dolphins", bet_amount=100, odds=170)
-# rangers = MoneyLine(event="rangers", bet_amount=100, odds=-120)
-# print(giants.print_stats())
-# print(dolphins.print_stats())
-# print(rangers.print_stats())
-
 class Parlay():
     def __init__(self, money_line_arr, bet_amount):
         self.money_line_arr = money_line_arr
