@@ -67,35 +67,13 @@ class System():
             return -statistics.mean(parlay_returns)
 
         bnds = ()
-        cons2 = []
         for i in range(len(self.all_parlays)):
-            parlay = self.all_parlays[i]
-
-            print("parlay.multiplier: ", parlay.multiplier)
-
             bnds += ((1, 30),)
-            cons2.append({'type': 'ineq', 'fun': lambda x: x[i] * parlay.multiplier + x[i] - sum(x) - 1 })
-            # cons += (({'type': 'ineq', 'fun': lambda x: x[i] - 1 },))
 
-        cons3 = [{'type': 'ineq', 'fun': lambda x, i=i : x[i] * self.all_parlays[i].multiplier + x[i] - sum(x) - 1 } for i in range(len(self.all_parlays))]
+        cons = [{'type': 'ineq', 'fun': lambda x, i=i : x[i] * self.all_parlays[i].multiplier - sum(x) - 1 } for i in range(len(self.all_parlays))]
 
-        cons = [{'type': 'ineq', 'fun': lambda x: x[0]*30.533760000000008+x[0] - (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]) - 1 },
-                {'type': 'ineq', 'fun': lambda x: x[1]*19.07683516483517+x[1] - (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]) - 1 },
-                {'type': 'ineq', 'fun': lambda x: x[2]*21.921936305732483+x[2] - (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]) - 1 },
-                {'type': 'ineq', 'fun': lambda x: x[3]*13.696353328200463+x[3] - (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]) - 1 },
-                {'type': 'ineq', 'fun': lambda x: x[4]*6.664114285714287+x[4] - (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]) - 1 },
-                {'type': 'ineq', 'fun': lambda x: x[5]*4.163594976452121+x[5] - (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]) - 1 },
-                {'type': 'ineq', 'fun': lambda x: x[6]*4.784549590536852+x[6] - (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]) - 1 },
-                {'type': 'ineq', 'fun': lambda x: x[7]*2.989283464488196+x[7] - (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]) - 1 }]
-
-        print("bmds:", bnds)
-        # print("cons:", inspect.getsource(cons[1]['fun']))
-        print("cons:", cons)
-        print("cons2:", cons2)
-        print("cons3:", cons3)
-
-        # COBYLA doesn't support bounds
-        FinalVal= optimize.minimize(f, [2, 2, 2, 2, 2, 2, 2, 2], method='SLSQP', bounds=bnds, constraints=cons)
+        # COBYLA doesn't support bounds in this format
+        FinalVal= optimize.minimize(f, [1, 1, 1, 1, 2, 3, 3.5, 1], method='SLSQP', bounds=bnds, constraints=cons)
         print(FinalVal)
 
         for i in range(len(FinalVal.x)):
@@ -115,12 +93,6 @@ class System():
             print('profit: ', profit)
             print('all_bets:', sum(FinalVal.x))
             print('==')
-
-        test = 3
-        print('ans', cons[test]['fun']([1, 1, 1, 1, 1.76884686, 2.2068189 , 2.05533119, 2.66535638]))
-        print('ans2', cons2[test]['fun']([1, 1, 1, 1, 1.76884686, 2.2068189 , 2.05533119, 2.66535638]))
-        print('ans3', cons3[test]['fun']([1, 1, 1, 1, 1.76884686, 2.2068189 , 2.05533119, 2.66535638]))
-
 
     # def solver(self):
     #     prob = LpProblem("Example_Problem", LpMaximize)
