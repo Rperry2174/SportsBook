@@ -5,6 +5,8 @@ from classes import *
 from pulp import *
 import statistics
 import scipy.optimize as optimize
+import inspect
+
 
 
 # Create the 'prob' variable to contain the problem data
@@ -59,34 +61,56 @@ class System():
 
             for i in range(len(x)):
                 parlay = self.all_parlays[i]
-                parlay_returns.append(x[i] * parlay.multiplier + x[i])
+                parlay_returns.append((x[i] * parlay.multiplier + x[i]) - sum(x))
 
             # print("statistics.mean(parlay_returns): ", statistics.mean(parlay_returns))
-            return statistics.mean(parlay_returns)
+            return -statistics.mean(parlay_returns)
 
         bnds = ()
-        cons = ()
+        # cons = ()
         for i in range(len(self.all_parlays)):
             parlay = self.all_parlays[i]
 
-            bnds += ((1, None),)
-            cons += (({'type': 'ineq', 'fun': lambda x: x[i] * parlay.multiplier + x[i] - sum(x) },))
+            bnds += ((1, 30),)
+            # cons += (({'type': 'ineq', 'fun': lambda x: x[i] * parlay.multiplier + x[i] - sum(x) },))
+            # cons += (({'type': 'ineq', 'fun': lambda x: x[i] - 1 },))
+
+
+        cons = ({'type': 'ineq', 'fun': lambda x: x[0]*29.5337600000000+x[0] - (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]) - 1 },
+                {'type': 'ineq', 'fun': lambda x: x[1]*18.0768351648000+x[1] - (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]) - 1 },
+                {'type': 'ineq', 'fun': lambda x: x[2]*20.9219363057000+x[2] - (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]) - 1 },
+                {'type': 'ineq', 'fun': lambda x: x[3]*12.6963533282000+x[3] - (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]) - 1 },
+                {'type': 'ineq', 'fun': lambda x: x[4]*5.6641142857100+x[4] - (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]) - 1 },
+                {'type': 'ineq', 'fun': lambda x: x[5]*3.1635949764500+x[5] - (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]) - 1 },
+                {'type': 'ineq', 'fun': lambda x: x[6]*3.7845495905400+x[6] - (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]) - 1 },
+                {'type': 'ineq', 'fun': lambda x: x[7]*1.9892834644900+x[7] - (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]) - 1 })
 
         print("bmds:", bnds)
-        print("cons:", cons)
+        # print("cons:", inspect.getsource(cons[1]['fun']))
+        print("cons:", cons[1])
 
-        FinalVal= optimize.minimize(f, [1, 1, 1, 1, 1, 1, 1, 1], method="SLSQP", bounds=bnds, constraints=cons)
+        # COBYLA doesn't support bounds
+        FinalVal= optimize.minimize(f, [2, 2, 2, 2, 2, 2, 2, 2], method='SLSQP', bounds=bnds, constraints=cons, maxiter=200)
         print(FinalVal)
 
         for i in range(len(FinalVal.x)):
             val = FinalVal.x[i]
             parlay = self.all_parlays[i]
             event = parlay.event
+            multiplier = parlay.multiplier
+            payout = val * parlay.multiplier
             profit = val * parlay.multiplier - sum(FinalVal.x)
 
-            print('val: ', val)
+            print('==')
+
             print('event: ', event)
+            print('val: ', val)
+            print('multiplier: ', multiplier)
+            print('payout: ', payout)
             print('profit: ', profit)
+            print('all_bets:', sum(FinalVal.x))
+            print('==')
+
 
     # def solver(self):
     #     prob = LpProblem("Example_Problem", LpMaximize)
