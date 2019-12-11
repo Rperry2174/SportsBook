@@ -3,6 +3,9 @@ import itertools
 import numpy as np
 from classes import *
 from pulp import *
+import statistics
+import scipy.optimize as optimize
+
 
 # Create the 'prob' variable to contain the problem data
 
@@ -50,41 +53,77 @@ class System():
             self.all_parlays.append(globals()["_".join(parlay_name)])
 
     def solver(self):
-        prob = LpProblem("Example_Problem", LpMaximize)
 
-        for parlay in self.all_parlays:
-            self.lp_variables[parlay.event] = LpVariable(name=parlay.event, lowBound=1, cat="Continuous")
+        def f(x):   # The rosenbrock function
+            parlay_returns = []
 
-        opt = 0
-        all_bets_sum = 0
-        # Set up optimization function and total bet amount
-        for parlay in self.all_parlays:
-            lp_var = self.lp_variables[parlay.event]
-            opt += (lp_var * parlay.multiplier + lp_var)
-            all_bets_sum += lp_var
+            for i in range(len(x)):
+                parlay = self.all_parlays[i]
+                parlay_returns.append(x[i] * parlay.multiplier + x[i])
 
-        print("opt: ", opt)
-        print("all_bets_sum: ", all_bets_sum)
+            # print("statistics.mean(parlay_returns): ", statistics.mean(parlay_returns))
+            return statistics.mean(parlay_returns)
 
-        prob += all_bets_sum / 8.0
+        bnds = ()
+        cons = ()
+        for i in range(len(self.all_parlays)):
+            parlay = self.all_parlays[i]
 
-        # Set up constraints to be added to problem
-        for parlay in self.all_parlays:
-            lp_var = self.lp_variables[parlay.event]
-            prob += (lp_var * parlay.multiplier + lp_var) - all_bets_sum >= 1
+            bnds += ((1, None),)
+            cons += (({'type': 'ineq', 'fun': lambda x: x[i] * parlay.multiplier + x[i] - sum(x) },))
 
-        prob.solve()
+        print("bmds:", bnds)
+        print("cons:", cons)
 
-        print("Status:", LpStatus[prob.status])
-        # Each of the variables is printed with it's resolved optimum value
-        total_bet_amount = 0
-        for v in prob.variables():
-            total_bet_amount += v.varValue
+        FinalVal= optimize.minimize(f, [1, 1, 1, 1, 1, 1, 1, 1], method="SLSQP", bounds=bnds, constraints=cons)
+        print(FinalVal)
 
-        for v in prob.variables():
-            for p in self.all_parlays:
-                if p.event == v.name:
-                    print(v.name, "bet=", v.varValue, "\n", "profit: ", v.varValue * p.multiplier - total_bet_amount)
+        for i in range(len(FinalVal.x)):
+            val = FinalVal.x[i]
+            parlay = self.all_parlays[i]
+            event = parlay.event
+            profit = val * parlay.multiplier - sum(FinalVal.x)
+
+            print('val: ', val)
+            print('event: ', event)
+            print('profit: ', profit)
+
+    # def solver(self):
+    #     prob = LpProblem("Example_Problem", LpMaximize)
+    #
+    #     for parlay in self.all_parlays:
+    #         self.lp_variables[parlay.event] = LpVariable(name=parlay.event, lowBound=1, cat="Continuous")
+    #
+    #     opt = 0
+    #     all_bets_sum = 0
+    #     # Set up optimization function and total bet amount
+    #     for parlay in self.all_parlays:
+    #         lp_var = self.lp_variables[parlay.event]
+    #         opt += (lp_var * parlay.multiplier + lp_var)
+    #         all_bets_sum += lp_var
+    #
+    #     print("opt: ", opt)
+    #     print("all_bets_sum: ", all_bets_sum)
+    #
+    #     prob += all_bets_sum / 8.0
+    #
+    #     # Set up constraints to be added to problem
+    #     for parlay in self.all_parlays:
+    #         lp_var = self.lp_variables[parlay.event]
+    #         prob += (lp_var * parlay.multiplier + lp_var) - all_bets_sum >= 1
+    #
+    #     prob.solve()
+    #
+    #     print("Status:", LpStatus[prob.status])
+    #     # Each of the variables is printed with it's resolved optimum value
+    #     total_bet_amount = 0
+    #     for v in prob.variables():
+    #         total_bet_amount += v.varValue
+    #
+    #     for v in prob.variables():
+    #         for p in self.all_parlays:
+    #             if p.event == v.name:
+    #                 print(v.name, "bet=", v.varValue, "\n", "profit: ", v.varValue * p.multiplier - total_bet_amount)
 
     def export_to_csv(self):
         csv_data = []
@@ -97,8 +136,6 @@ class System():
 binaries = [[broncos, chiefs], [texans, titans], [dolphins, giants]]
 s = System(binaries=binaries)
 s.solver()
-print(s.lp_variables)
-print(s.all_parlays)
 
 
 # def f2(num_options):
