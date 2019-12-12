@@ -12,6 +12,21 @@ def generalized_reduced_gradient(num_vars):
 		globals()[x_var] = symbols(x_var)
 		xvars.append(globals()[x_var])
 
+    # for i in range(len(x)):
+    #     parlay = self.all_parlays[i]
+    #     parlay_returns.append((x[i] * parlay.multiplier + x[i]) - sum(x))
+
+	# fx = (x0 + x1 + x2 + x3 + x4 + x5 + x6 + x7) / 8.0
+	# hxs = [x0*30.533760000000008+x0 - (x0 + x1 + x2 + x3 + x4 + x5 + x6 + x7) - 1,
+    #         x1*19.07683516483517+x1 - (x0 + x1 + x2 + x3 + x4 + x5 + x6 + x7) - 1,
+    #         x2*21.921936305732483+x2 - (x0 + x1 + x2 + x3 + x4 + x5 + x6 + x7) - 1,
+    #         x3*13.696353328200463+x3 - (x0 + x1 + x2 + x3 + x4 + x5 + x6 + x7) - 1,
+    #         x4*6.664114285714287+x4 - (x0 + x1 + x2 + x3 + x4 + x5 + x6 + x7) - 1,
+    #         x5*4.163594976452121+x5 - (x0 + x1 + x2 + x3 + x4 + x5 + x6 + x7) - 1,
+    #         x6*4.784549590536852+x6 - (x0 + x1 + x2 + x3 + x4 + x5 + x6 + x7) - 1,
+    #         x7*2.989283464488196+x7 - (x0 + x1 + x2 + x3 + x4 + x5 + x6 + x7) - 1]
+
+
 	fx = 4 * x0 - x1 ** 2 + x2 ** 2 - 12				# Function to be minimized
 	hxs = [20 - x0 ** 2 - x1 ** 2, x0 + x2 - 7]			# Constraints to be obeyed
 	alpha_0 = 1											# Parameter initializations
