@@ -54,7 +54,7 @@ class System():
             globals()["_".join(parlay_name)] = Parlay(money_line_arr=parlay, bet_amount=1)
             self.all_parlays.append(globals()["_".join(parlay_name)])
 
-    def solver(self):
+    def slsqp_solver(self):
 
         def f(x):   # The rosenbrock function
             parlay_returns = []
@@ -94,42 +94,57 @@ class System():
             print('all_bets:', sum(FinalVal.x))
             print('==')
 
-    # def solver(self):
-    #     prob = LpProblem("Example_Problem", LpMaximize)
-    #
-    #     for parlay in self.all_parlays:
-    #         self.lp_variables[parlay.event] = LpVariable(name=parlay.event, lowBound=1, cat="Continuous")
-    #
-    #     opt = 0
-    #     all_bets_sum = 0
-    #     # Set up optimization function and total bet amount
-    #     for parlay in self.all_parlays:
-    #         lp_var = self.lp_variables[parlay.event]
-    #         opt += (lp_var * parlay.multiplier + lp_var)
-    #         all_bets_sum += lp_var
-    #
-    #     print("opt: ", opt)
-    #     print("all_bets_sum: ", all_bets_sum)
-    #
-    #     prob += all_bets_sum / 8.0
-    #
-    #     # Set up constraints to be added to problem
-    #     for parlay in self.all_parlays:
-    #         lp_var = self.lp_variables[parlay.event]
-    #         prob += (lp_var * parlay.multiplier + lp_var) - all_bets_sum >= 1
-    #
-    #     prob.solve()
-    #
-    #     print("Status:", LpStatus[prob.status])
-    #     # Each of the variables is printed with it's resolved optimum value
-    #     total_bet_amount = 0
-    #     for v in prob.variables():
-    #         total_bet_amount += v.varValue
-    #
-    #     for v in prob.variables():
-    #         for p in self.all_parlays:
-    #             if p.event == v.name:
-    #                 print(v.name, "bet=", v.varValue, "\n", "profit: ", v.varValue * p.multiplier - total_bet_amount)
+    def lp_solver(self):
+        prob = LpProblem("Example_Problem", LpMaximize)
+
+        for parlay in self.all_parlays:
+            self.lp_variables[parlay.event] = LpVariable(name=parlay.event, lowBound=1, cat="Continuous")
+
+        opt = 0
+        all_bets_sum = 0
+        # Set up optimization function and total bet amount
+        for parlay in self.all_parlays:
+            lp_var = self.lp_variables[parlay.event]
+            opt += (lp_var * parlay.multiplier)
+            all_bets_sum += lp_var
+
+        print("opt: ", opt)
+        print("all_bets_sum: ", all_bets_sum)
+
+        prob += all_bets_sum / len(self.all_parlays)
+
+        # Set up constraints to be added to problem
+        for parlay in self.all_parlays:
+            lp_var = self.lp_variables[parlay.event]
+            prob += (lp_var * parlay.multiplier + lp_var) - all_bets_sum >= 1
+
+        prob.solve()
+
+        print("Status:", LpStatus[prob.status])
+        # Each of the variables is printed with it's resolved optimum value
+        total_bet_amount = 0
+        for v in prob.variables():
+            total_bet_amount += v.varValue
+
+        for v in prob.variables():
+            for p in self.all_parlays:
+                if p.event == v.name:
+                    val = v.varValue
+                    parlay = p
+                    event = parlay.event
+                    multiplier = parlay.multiplier
+                    payout = val * parlay.multiplier
+                    profit = val * parlay.multiplier - total_bet_amount
+
+                    print('==')
+
+                    print('event: ', event)
+                    print('val: ', val)
+                    print('multiplier: ', multiplier)
+                    print('payout: ', payout)
+                    print('profit: ', profit)
+                    print('all_bets:', total_bet_amount)
+                    print('==')
 
     def export_to_csv(self):
         csv_data = []
@@ -140,8 +155,15 @@ class System():
 
 
 binaries = [[broncos, chiefs], [texans, titans], [dolphins, giants]]
-s = System(binaries=binaries)
-s.solver()
+x = System(binaries=binaries)
+print("=================================================")
+x.slsqp_solver()
+print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+print("|||||||||||||||||||||||||||||||||||||||||||||||||||")
+x.lp_solver()
+print("|||||||||||||||||||||||||||||||||||||||||||||||||||")
+
 
 
 # def f2(num_options):
