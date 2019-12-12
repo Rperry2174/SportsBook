@@ -4,13 +4,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sympy import *
 
-def generalized_reduced_gradient():
+def generalized_reduced_gradient(num_vars):
 
-	x1, x2, x3 = symbols('x1 x2 x3')
-	xvars = [x1, x2, x3]
+	xvars = []
+	for i in range(num_vars):
+		x_var = 'x' + str(i)
+		globals()[x_var] = symbols(x_var)
+		xvars.append(globals()[x_var])
 
-	fx = 4 * x1 - x2 ** 2 + x3 ** 2 - 12				# Function to be minimized
-	hxs = [20 - x1 ** 2 - x2 ** 2, x1 + x3 - 7]			# Constraints to be obeyed
+	fx = 4 * x0 - x1 ** 2 + x2 ** 2 - 12				# Function to be minimized
+	hxs = [20 - x0 ** 2 - x1 ** 2, x0 + x2 - 7]			# Constraints to be obeyed
 	alpha_0 = 1											# Parameter initializations
 	gamma = 0.4
 	max_iter = 100
@@ -117,4 +120,4 @@ def generalized_reduced_gradient():
 	plt.show()
 
 if __name__ == '__main__':
-	generalized_reduced_gradient()
+	generalized_reduced_gradient(3)
