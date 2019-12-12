@@ -71,3 +71,9 @@ class Parlay():
         print("multiplier: ", self.multiplier)
         print("payout:" , self.payout)
         print("=========================")
+
+# ml = MoneyLine(event="broncos", bet_amount=10, odds=120)
+# ml.print_stats()
+#
+# ml = MoneyLine(event="broncos", bet_amount=15, odds=-150)
+# ml.print_stats()
