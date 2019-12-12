@@ -1,6 +1,7 @@
 import math
 import itertools
 import numpy as np
+import pandas as pd
 from classes import *
 from pulp import *
 import statistics
@@ -54,7 +55,7 @@ class System():
             globals()["_".join(parlay_name)] = Parlay(money_line_arr=parlay, bet_amount=1)
             self.all_parlays.append(globals()["_".join(parlay_name)])
 
-    def slsqp_solver(self):
+    def slsqp_solver(self, initial_guess):
 
         def f(x):   # The rosenbrock function
             parlay_returns = []
@@ -73,8 +74,14 @@ class System():
         cons = [{'type': 'ineq', 'fun': lambda x, i=i : x[i] * self.all_parlays[i].multiplier - sum(x) - 1 } for i in range(len(self.all_parlays))]
 
         # COBYLA doesn't support bounds in this format
-        FinalVal= optimize.minimize(f, [1, 1, 1, 1, 2, 3, 3.5, 1], method='SLSQP', bounds=bnds, constraints=cons)
+        FinalVal= optimize.minimize(f, initial_guess, method='SLSQP', bounds=bnds, constraints=cons)
         print(FinalVal)
+
+        events = []
+        bets = []
+        multipliers = []
+        payouts = []
+        profits = []
 
         for i in range(len(FinalVal.x)):
             val = FinalVal.x[i]
@@ -84,15 +91,21 @@ class System():
             payout = val * parlay.multiplier
             profit = val * parlay.multiplier - sum(FinalVal.x)
 
-            print('==')
+            events.append(event)
+            bets.append(val)
+            multipliers.append(multiplier)
+            payouts.append(payout)
+            profits.append(round(profit, 4))
 
-            print('event: ', event)
-            print('val: ', val)
-            print('multiplier: ', multiplier)
-            print('payout: ', payout)
-            print('profit: ', profit)
-            print('all_bets:', sum(FinalVal.x))
-            print('==')
+        df = pd.DataFrame({'event': events,
+                           'bet': bets,
+                           'multiplier': multipliers,
+                           'payout': payouts,
+                           'profit': profits
+                            })
+        print('slsqp_solver: ')
+        print(df)
+
 
     def lp_solver(self):
         prob = LpProblem("Example_Problem", LpMaximize)
@@ -126,6 +139,13 @@ class System():
         for v in prob.variables():
             total_bet_amount += v.varValue
 
+
+        events = []
+        bets = []
+        multipliers = []
+        payouts = []
+        profits = []
+
         for v in prob.variables():
             for p in self.all_parlays:
                 if p.event == v.name:
@@ -136,15 +156,20 @@ class System():
                     payout = val * parlay.multiplier
                     profit = val * parlay.multiplier - total_bet_amount
 
-                    print('==')
+                    events.append(event)
+                    bets.append(val)
+                    multipliers.append(multiplier)
+                    payouts.append(payout)
+                    profits.append(round(profit, 4))
 
-                    print('event: ', event)
-                    print('val: ', val)
-                    print('multiplier: ', multiplier)
-                    print('payout: ', payout)
-                    print('profit: ', profit)
-                    print('all_bets:', total_bet_amount)
-                    print('==')
+        df = pd.DataFrame({'event': events,
+                           'bet': bets,
+                           'multiplier': multipliers,
+                           'payout': payouts,
+                           'profit': profits
+                            })
+        print('lp_solver: ')
+        print(df)
 
     def export_to_csv(self):
         csv_data = []
@@ -157,7 +182,7 @@ class System():
 binaries = [[broncos, chiefs], [texans, titans], [dolphins, giants]]
 x = System(binaries=binaries)
 print("=================================================")
-x.slsqp_solver()
+x.slsqp_solver([1, 1, 1, 1, 2, 3, 3.5, 1])
 print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 print("|||||||||||||||||||||||||||||||||||||||||||||||||||")
