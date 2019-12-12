@@ -28,7 +28,7 @@ chiefs.print_stats()
 titans.print_stats()
 giants.print_stats()
 
-class System():
+class ParlaySystem():
     def __init__(self, binaries):
         self.binaries = binaries
         self.lp_variables = {}
@@ -180,7 +180,7 @@ class System():
 
 
 binaries = [[broncos, chiefs], [texans, titans], [dolphins, giants]]
-x = System(binaries=binaries)
+x = ParlaySystem(binaries=binaries)
 print("=================================================")
 x.slsqp_solver([1, 1, 1, 1, 2, 3, 3.5, 1])
 print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
