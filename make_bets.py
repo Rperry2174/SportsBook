@@ -59,16 +59,23 @@ from parlay_system import *
 # x.lp_solver()
 # print("|||||||||||||||||||||||||||||||||||||||||||||||||||")
 
-phi = MoneyLine(event="phi", bet_amount=100, odds=-115)
+phi = MoneyLine(event="phi", bet_amount=100, odds=-110)
+bos = MoneyLine(event="bos", bet_amount=100, odds=-108)
+
 cle = MoneyLine(event="cle", bet_amount=100, odds=540)
-det = MoneyLine(event="det", bet_amount=100, odds=260)
-por = MoneyLine(event="por", bet_amount=100, odds=235)
-#
-bos = MoneyLine(event="bos", bet_amount=100, odds=-103)
 sa = MoneyLine(event="sa", bet_amount=100, odds=-715)
+
 dal = MoneyLine(event="dal", bet_amount=100, odds=-315)
+det = MoneyLine(event="det", bet_amount=100, odds=260)
+
+por = MoneyLine(event="por", bet_amount=100, odds=235)
 den = MoneyLine(event="den", bet_amount=100, odds=-286)
 
+iowa = MoneyLine(event="iowa", bet_amount=100, odds=148)
+iowa_st = MoneyLine(event="iowa_st", bet_amount=100, odds=-180)
+
+northern_iowa = MoneyLine(event="northern_iowa", bet_amount=100, odds=-250)
+grand_canyon = MoneyLine(event="grand_canyon", bet_amount=100, odds=205)
 # buf_sabres.print_stats()
 # ny_rangers.print_stats()
 # car_hurricanes.print_stats()
@@ -77,6 +84,8 @@ den = MoneyLine(event="den", bet_amount=100, odds=-286)
 # cgy_flames.print_stats()
 
 binaries = [[cle, sa], [det, dal], [por, den], [phi, bos]]
+binaries = [[det, dal], [por, den], [phi, bos], [iowa, iowa_st]]
+binaries = [[det, dal], [por, den], [northern_iowa, grand_canyon], [iowa, iowa_st]]
 
 x = ParlaySystem(binaries=binaries)
 print("=================================================")
