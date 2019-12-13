@@ -17,6 +17,20 @@ class ParlaySystem():
         self.bounds = bounds
         self.create_parlay_system()
 
+    def print_parlay_odds_diff(self):
+        result = [0, 0]
+        for binary in self.binaries:
+            for ml in binary:
+                if ml.odds >= 0:
+                    result[0] += ml.odds
+                else:
+                    result[1] += ml.odds
+
+        print('[ + , - ]: ', result)
+        print(' pos/neg :', result[0] / result[1])
+        print('toalt_dif: ', sum(result))
+
+
     def select_flattened_prop(self, prop):
         np_binaries = np.array(self.binaries)
         np_binaries = np_binaries.flatten()
@@ -89,6 +103,7 @@ class ParlaySystem():
         print('slsqp_solver: ')
         print(df)
         print('total_bet: ', sum(bets))
+        self.print_parlay_odds_diff()
 
 
     def lp_solver(self):

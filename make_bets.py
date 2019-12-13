@@ -77,8 +77,8 @@ iowa_st = MoneyLine(event="iowa_st", bet_amount=100, odds=-180)
 northern_iowa = MoneyLine(event="northern_iowa", bet_amount=100, odds=-250)
 grand_canyon = MoneyLine(event="grand_canyon", bet_amount=100, odds=205)
 
-test1 = MoneyLine(event="test1", bet_amount=100, odds=-177)
-test2 = MoneyLine(event="test2", bet_amount=100, odds=145)
+moreno = MoneyLine(event="moreno", bet_amount=100, odds=-167)
+france = MoneyLine(event="france", bet_amount=100, odds=135)
 # buf_sabres.print_stats()
 # ny_rangers.print_stats()
 # car_hurricanes.print_stats()
@@ -91,13 +91,14 @@ test2 = MoneyLine(event="test2", bet_amount=100, odds=145)
 # binaries = [[det, dal], [por, den], [northern_iowa, grand_canyon], [iowa, iowa_st], [phi, bos]]
 # binaries = [[det, dal], [por, den], [northern_iowa, grand_canyon], [iowa, iowa_st]]
 # binaries = [[test1, test2], [por, den], [northern_iowa, grand_canyon], [iowa, iowa_st]]
-binaries = [[por, den], [northern_iowa, grand_canyon], [iowa, iowa_st]] # best
+binaries = [[por, den], [moreno, france], [iowa, iowa_st]]
+# binaries = [[por, den], [northern_iowa, grand_canyon], [iowa, iowa_st]] # best
 
 
 
 
 # NOTE: 0 - POSITIVE_NUMBER + NEGATIVE_NUMBER (Maximize that)
-x = ParlaySystem(binaries=binaries, target_profit=1, bounds=(0.01, 30))
+x = ParlaySystem(binaries=binaries, target_profit=0.5, bounds=(0.01, 30))
 print("=================================================")
 x.slsqp_solver()
 # print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
