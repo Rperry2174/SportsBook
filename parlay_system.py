@@ -9,11 +9,12 @@ import scipy.optimize as optimize
 import inspect
 
 class ParlaySystem():
-    def __init__(self, binaries, target_profit=1):
+    def __init__(self, binaries, target_profit=1, bounds=(0, 30)):
         self.binaries = binaries
         self.lp_variables = {}
         self.all_parlays = []
         self.target_profit = target_profit
+        self.bounds = bounds
         self.create_parlay_system()
 
     def select_flattened_prop(self, prop):
@@ -39,18 +40,19 @@ class ParlaySystem():
     def slsqp_solver(self):
 
         def f(x):   # The rosenbrock function
-            parlay_returns = []
+            parlay_profits = []
 
             for i in range(len(x)):
                 parlay = self.all_parlays[i]
-                parlay_returns.append((x[i] * parlay.multiplier + x[i]) - sum(x))
+                profit = (x[i] * parlay.multiplier + x[i]) - sum(x)
+                parlay_profits.append(profit)
 
-            # print("statistics.mean(parlay_returns): ", statistics.mean(parlay_returns))
-            return -statistics.mean(parlay_returns)
+            # print("statistics.mean(parlay_profits): ", statistics.mean(parlay_profits))
+            return -statistics.mean(parlay_profits)
 
         bnds = ()
         for i in range(len(self.all_parlays)):
-            bnds += ((1, 30),)
+            bnds += (self.bounds,)
 
         cons = [{'type': 'ineq', 'fun': lambda x, i=i : x[i] * self.all_parlays[i].multiplier - sum(x) - self.target_profit } for i in range(len(self.all_parlays))]
 
@@ -73,9 +75,9 @@ class ParlaySystem():
             profit = val * parlay.multiplier - sum(FinalVal.x)
 
             events.append(event)
-            bets.append(val)
+            bets.append(round(val, 2))
             multipliers.append(multiplier)
-            payouts.append(payout)
+            payouts.append(round(payout, 4))
             profits.append(round(profit, 4))
 
         df = pd.DataFrame({'event': events,
@@ -86,6 +88,7 @@ class ParlaySystem():
                             })
         print('slsqp_solver: ')
         print(df)
+        print('total_bet: ', sum(bets))
 
 
     def lp_solver(self):
@@ -138,9 +141,9 @@ class ParlaySystem():
                     profit = val * parlay.multiplier - total_bet_amount
 
                     events.append(event)
-                    bets.append(val)
+                    bets.append(round(val, 4))
                     multipliers.append(multiplier)
-                    payouts.append(payout)
+                    payouts.append(round(payout, 4))
                     profits.append(round(profit, 4))
 
         df = pd.DataFrame({'event': events,
