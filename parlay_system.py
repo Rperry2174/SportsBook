@@ -8,26 +8,6 @@ import statistics
 import scipy.optimize as optimize
 import inspect
 
-
-
-# Create the 'prob' variable to contain the problem data
-
-broncos = MoneyLine(event="broncos", bet_amount=100, odds=440)
-texans = MoneyLine(event="texans", bet_amount=100, odds=128)
-dolphins = MoneyLine(event="dolphins", bet_amount=100, odds=148)
-#
-chiefs = MoneyLine(event="chiefs", bet_amount=100, odds=-560)
-titans = MoneyLine(event="titans", bet_amount=100, odds=-157)
-giants = MoneyLine(event="giants", bet_amount=100, odds=-182)
-
-broncos.print_stats()
-texans.print_stats()
-dolphins.print_stats()
-#
-chiefs.print_stats()
-titans.print_stats()
-giants.print_stats()
-
 class ParlaySystem():
     def __init__(self, binaries):
         self.binaries = binaries
@@ -48,14 +28,14 @@ class ParlaySystem():
             parlay_name = []
             for j in range(len(tuple)):
                 selection = tuple[j]
-                money_line = binaries[j][selection]
+                money_line = self.binaries[j][selection]
                 parlay.append(money_line)
                 parlay_name.append(money_line.event)
 
             globals()["_".join(parlay_name)] = Parlay(money_line_arr=parlay, bet_amount=1)
             self.all_parlays.append(globals()["_".join(parlay_name)])
 
-    def slsqp_solver(self, initial_guess):
+    def slsqp_solver(self):
 
         def f(x):   # The rosenbrock function
             parlay_returns = []
@@ -74,7 +54,7 @@ class ParlaySystem():
         cons = [{'type': 'ineq', 'fun': lambda x, i=i : x[i] * self.all_parlays[i].multiplier - sum(x) - 1 } for i in range(len(self.all_parlays))]
 
         # COBYLA doesn't support bounds in this format
-        FinalVal= optimize.minimize(f, initial_guess, method='SLSQP', bounds=bnds, constraints=cons)
+        FinalVal= optimize.minimize(f, np.ones(len(self.all_parlays)), method='SLSQP', bounds=bnds, constraints=cons)
         print(FinalVal)
 
         events = []
@@ -177,19 +157,3 @@ class ParlaySystem():
             csv_data.append(parlay.format_stats_for_csv())
 
         print("\n".join(csv_data))
-
-
-binaries = [[broncos, chiefs], [texans, titans], [dolphins, giants]]
-x = ParlaySystem(binaries=binaries)
-print("=================================================")
-x.slsqp_solver([1, 1, 1, 1, 2, 3, 3.5, 1])
-print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-print("|||||||||||||||||||||||||||||||||||||||||||||||||||")
-x.lp_solver()
-print("|||||||||||||||||||||||||||||||||||||||||||||||||||")
-
-
-
-# def f2(num_options):
-#     f = np.zeros(num_options)
