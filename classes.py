@@ -77,3 +77,9 @@ class Parlay():
 #
 # ml = MoneyLine(event="broncos", bet_amount=15, odds=-150)
 # ml.print_stats()
+
+# bears = MoneyLine(event="bears", bet_amount=15, odds=425)
+# broncos = MoneyLine(event="broncos", bet_amount=15, odds=190)
+#
+# p = Parlay(money_line_arr=[bears, broncos], bet_amount=1)
+# p.print_stats()
