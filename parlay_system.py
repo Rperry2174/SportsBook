@@ -9,10 +9,11 @@ import scipy.optimize as optimize
 import inspect
 
 class ParlaySystem():
-    def __init__(self, binaries):
+    def __init__(self, binaries, target_profit=1):
         self.binaries = binaries
         self.lp_variables = {}
         self.all_parlays = []
+        self.target_profit = target_profit
         self.create_parlay_system()
 
     def select_flattened_prop(self, prop):
@@ -51,7 +52,7 @@ class ParlaySystem():
         for i in range(len(self.all_parlays)):
             bnds += ((1, 30),)
 
-        cons = [{'type': 'ineq', 'fun': lambda x, i=i : x[i] * self.all_parlays[i].multiplier - sum(x) - 1 } for i in range(len(self.all_parlays))]
+        cons = [{'type': 'ineq', 'fun': lambda x, i=i : x[i] * self.all_parlays[i].multiplier - sum(x) - self.target_profit } for i in range(len(self.all_parlays))]
 
         # COBYLA doesn't support bounds in this format
         FinalVal= optimize.minimize(f, np.ones(len(self.all_parlays)), method='SLSQP', bounds=bnds, constraints=cons)
@@ -109,7 +110,7 @@ class ParlaySystem():
         # Set up constraints to be added to problem
         for parlay in self.all_parlays:
             lp_var = self.lp_variables[parlay.event]
-            prob += (lp_var * parlay.multiplier + lp_var) - all_bets_sum >= 1
+            prob += (lp_var * parlay.multiplier + lp_var) - all_bets_sum >= self.target_profit
 
         prob.solve()
 
