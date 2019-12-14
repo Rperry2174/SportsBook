@@ -9,12 +9,13 @@ import scipy.optimize as optimize
 import inspect
 
 class ParlaySystem():
-    def __init__(self, binaries, target_profit=1, bounds=(0, 30)):
+    def __init__(self, binaries, target_profit=1, bounds=(0, 30), index_arr=[]):
         self.binaries = binaries
         self.lp_variables = {}
         self.all_parlays = []
         self.target_profit = target_profit
         self.bounds = bounds
+        self.index_arr = index_arr
         self.create_parlay_system()
 
     def print_parlay_odds_diff(self):
@@ -100,10 +101,19 @@ class ParlaySystem():
                            'payout': payouts,
                            'profit': profits
                             })
+
+        total_bet = round(sum(bets), 2)
         print('slsqp_solver: ')
         print(df)
-        print('total_bet: ', round(sum(bets), 2))
+        print('total_bet   : ', total_bet)
+        print('mean        : ', df["profit"].mean())
+        print('max         : ', df["profit"].max())
+        print('min         : ', df["profit"].min())
+        print('std         : ', df["profit"].std())
+        print(df.describe())
         self.print_parlay_odds_diff()
+        res = [self.index_arr, total_bet,df["profit"].mean(), df["profit"].std(), df["profit"].max(), df["profit"].min()]
+        return res
 
 
     def lp_solver(self):
