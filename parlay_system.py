@@ -9,14 +9,26 @@ import scipy.optimize as optimize
 import inspect
 
 class ParlaySystem():
-    def __init__(self, binaries, target_profit=1, bounds=(0, 30), index_arr=[]):
+    def __init__(self, binaries, target_profit=1, bounds=(0, 30), binary_index_arr=[]):
         self.binaries = binaries
         self.lp_variables = {}
         self.all_parlays = []
         self.target_profit = target_profit
         self.bounds = bounds
-        self.index_arr = index_arr
+        self.binary_index_arr = binary_index_arr
+        self.ml_dict = {}
+
         self.create_parlay_system()
+        self.create_ml_dict()
+
+    def create_ml_dict(self):
+        id = 0
+        for binary in self.binaries:
+            for ml in binary:
+                self.ml_dict[id] = ml.event
+                id += 1
+
+        return self.ml_dict
 
     def print_parlay_odds_diff(self):
         result = [0, 0]
@@ -101,6 +113,7 @@ class ParlaySystem():
                            'payout': payouts,
                            'profit': profits
                             })
+        df = df.sort_values(by=['profit'])
 
         total_bet = round(sum(bets), 2)
         print('slsqp_solver: ')
@@ -112,8 +125,8 @@ class ParlaySystem():
         print('std         : ', df["profit"].std())
         print(df.describe())
         self.print_parlay_odds_diff()
-        res = [self.index_arr, total_bet,df["profit"].mean(), df["profit"].std(), df["profit"].max(), df["profit"].min()]
-        return res
+        csv_data = [self.binary_index_arr, total_bet,df["profit"].mean(), df["profit"].std(), df["profit"].max(), df["profit"].min()]
+        return csv_data, df
 
 
     def lp_solver(self):
