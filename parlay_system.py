@@ -9,26 +9,18 @@ import scipy.optimize as optimize
 import inspect
 
 class ParlaySystem():
-    def __init__(self, binaries, target_profit=1, bounds=(0, 30), binary_index_arr=[]):
+    def __init__(self, binaries, target_profit, bounds, binary_index_arr, binary_results_arr, index_to_ml={}, index_to_outcome={}):
         self.binaries = binaries
         self.lp_variables = {}
         self.all_parlays = []
         self.target_profit = target_profit
         self.bounds = bounds
         self.binary_index_arr = binary_index_arr
-        self.ml_dict = {}
+        self.binary_results_arr = binary_results_arr
+        self.index_to_ml = {}
+        self.index_to_outcome = {}
 
         self.create_parlay_system()
-        self.create_ml_dict()
-
-    def create_ml_dict(self):
-        id = 0
-        for binary in self.binaries:
-            for ml in binary:
-                self.ml_dict[id] = ml.event
-                id += 1
-
-        return self.ml_dict
 
     def print_parlay_odds_diff(self):
         result = [0, 0]

@@ -4,12 +4,16 @@ import numpy as np
 
 class MoneyLine():
     def __init__(self, event, bet_amount, odds):
+        self.index = None
         self.event = event
         self.bet_amount = bet_amount
         self.odds = odds
         self.multiplier = self.calculate_multiplier()
         self.payout = self.calculate_payout()
 
+    def set_index(self, new_index):
+        self.index = new_index
+        
     def calculate_multiplier(self):
         if self.odds > 0:
             return 1 + (self.odds / 100.0)

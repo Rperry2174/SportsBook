@@ -37,7 +37,40 @@ loyola  = MoneyLine(event="loyola", bet_amount=100, odds=-335)
 gkminus1 =  MoneyLine(event="gkminus1", bet_amount=100, odds=220)
 dalstarsplus1 =  MoneyLine(event="dalstarsplus1", bet_amount=100, odds=-278)
 
+# syracuse8 = MoneyLine(event="syracuse8", bet_amount=100, odds=220)
+# baylor9 = MoneyLine(event="baylor9", bet_amount=100, odds=220)
+#
+# floridastate4 = MoneyLine(event="floridastate4", bet_amount=100, odds=220)
+# vermont13 = MoneyLine(event="vermont13", bet_amount=100, odds=220)
+#
+# marquette5 = MoneyLine(event="marquette5", bet_amount=100, odds=220)
+# murrayst12 = MoneyLine(event="murrayst12", bet_amount=100, odds=220)
+#
+# michiganst2 = MoneyLine(event="michiganst2", bet_amount=100, odds=220)
+# montana15 = MoneyLine(event="montana15", bet_amount=100, odds=220)
+#
+# nevada7 = MoneyLine(event="nevada7", bet_amount=100, odds=220)
+# florida10 = MoneyLine(event="florida10", bet_amount=100, odds=220)
+#
+# texastech3 = MoneyLine(event="texastech3", bet_amount=100, odds=220)
+# nkentucky14 = MoneyLine(event="nkentucky14", bet_amount=100, odds=220)
+#
+# buffalo6 = MoneyLine(event="buffalo6", bet_amount=100, odds=220)
+# arizonast11 = MoneyLine(event="arizonast11", bet_amount=100, odds=220)
 
+
+# binaries = [
+#     [virginiatech4, stlouis13],
+#     [michiganst2, bradley15
+#     [louisville7, minnesota10],
+#     [lsu3, yale14],
+#     [maryland6, belmont11],
+#     [nebraska, indiana],
+#     [colorado, cstate],
+#     [pover, punder],
+#     [prarieview, loyola],
+#     [gkminus1, dalstarsplus1],
+# ]
 
 
 
@@ -49,7 +82,7 @@ dalstarsplus1 =  MoneyLine(event="dalstarsplus1", bet_amount=100, odds=-278)
 # ncccentral16 =  MoneyLine(event="ncccentral16", bet_amount=100, odds=-278)
 
 vcu8 =  MoneyLine(event="vcu8", bet_amount=100, odds=-114)
-ucf9 =  MoneyLine(event="ncccentral16", bet_amount=100, odds=-104)
+ucf9 =  MoneyLine(event="ucf9", bet_amount=100, odds=-104)
 
 virginiatech4 = MoneyLine(event="virginiatech4", bet_amount=100, odds=-530)
 stlouis13 = MoneyLine(event="stlouis13", bet_amount=100, odds=410)
@@ -57,7 +90,7 @@ stlouis13 = MoneyLine(event="stlouis13", bet_amount=100, odds=410)
 missst5 = MoneyLine(event="missst5", bet_amount=100, odds=-345)
 liberty12 = MoneyLine(event="liberty12", bet_amount=100, odds=280)
 
-michigan2 = MoneyLine(event="michigan2", bet_amount=100, odds=-2500)
+michiganst2 = MoneyLine(event="michiganst2", bet_amount=100, odds=-2500)
 bradley15 = MoneyLine(event="bradley15", bet_amount=100, odds=1300)
 
 louisville7 = MoneyLine(event="louisville7", bet_amount=100, odds=-225)
@@ -73,47 +106,20 @@ east_region_binaries = [
     [vcu8, ucf9],
     [virginiatech4, stlouis13],
     [missst5,liberty12],
-    [michigan2, bradley15],
+    [michiganst2, bradley15],
     [louisville7, minnesota10],
     [lsu3, yale14],
 ]
 
+east_region_results = [
+    [0, 1],
+    [1, 0],
+    [0, 1],
+    [1, 0],
+    [0, 1],
+    [1, 0],
+]
 
-
-# syracuse8 = MoneyLine(event="syracuse8", bet_amount=100, odds=220)
-# baylor9 = MoneyLine(event="baylor9", bet_amount=100, odds=220)
-#
-# floridastate4 = MoneyLine(event="floridastate4", bet_amount=100, odds=220)
-# vermont13 = MoneyLine(event="vermont13", bet_amount=100, odds=220)
-#
-# marquette5 = MoneyLine(event="marquette5", bet_amount=100, odds=220)
-# murrayst12 = MoneyLine(event="murrayst12", bet_amount=100, odds=220)
-#
-# michigan2 = MoneyLine(event="michigan2", bet_amount=100, odds=220)
-# montana15 = MoneyLine(event="montana15", bet_amount=100, odds=220)
-#
-# nevada7 = MoneyLine(event="nevada7", bet_amount=100, odds=220)
-# florida10 = MoneyLine(event="florida10", bet_amount=100, odds=220)
-#
-# texastech3 = MoneyLine(event="texastech3", bet_amount=100, odds=220)
-# nkentucky14 = MoneyLine(event="nkentucky14", bet_amount=100, odds=220)
-#
-# buffalo6 = MoneyLine(event="buffalo6", bet_amount=100, odds=220)
-# arizonast11 = MoneyLine(event="arizonast11", bet_amount=100, odds=220)
-
-
-# binaries = [
-#     [virginiatech4, stlouis13],
-#     [michigan2, bradley15
-#     [louisville7, minnesota10],
-#     [lsu3, yale14],
-#     [maryland6, belmont11],
-#     [nebraska, indiana],
-#     [colorado, cstate],
-#     [pover, punder],
-#     [prarieview, loyola],
-#     [gkminus1, dalstarsplus1],
-# ]
 
 # binaries = east_region_binaries
 
@@ -139,18 +145,22 @@ df = pd.DataFrame()
 for i in range(len(all_subsets)):
     current_subset = all_subsets[i]
     parlay_binaries = []
+    winning_binaries = []
+
     for i in range(len(current_subset)):
         index = current_subset[i]
         parlay_binaries.append(east_region_binaries[index])
+        winning_binaries.append(east_region_results[index])
 
     ps = ParlaySystem(binaries=parlay_binaries,
                     target_profit=1.2,
                     bounds=(0.01, 30),
-                    binary_index_arr=list(current_subset)
+                    binary_index_arr=list(current_subset),
+                    binary_results_arr=winning_binaries
                     )
     csv_res, raw_df = ps.slsqp_solver()
     df = pd.concat([df, raw_df])
     csv.append(tmp_res)
 
 print(csv)
-print(ps.create_ml_dict())
+# print(ps.create_ml_dict())
