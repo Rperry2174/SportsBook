@@ -92,7 +92,7 @@ class ParlaySystem():
             bets.append(round(val, 2))
             multipliers.append(multiplier)
             payouts.append(round(payout, 4))
-            profits.append(round(profit, 4))
+            profits.append(round(profit, 2))
 
         df = pd.DataFrame({'event': events,
                            'bet': bets,
@@ -102,7 +102,7 @@ class ParlaySystem():
                             })
         print('slsqp_solver: ')
         print(df)
-        print('total_bet: ', sum(bets))
+        print('total_bet: ', round(sum(bets), 2))
         self.print_parlay_odds_diff()
 
 
