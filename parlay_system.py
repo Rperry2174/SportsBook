@@ -17,8 +17,8 @@ class ParlaySystem():
         self.bounds = bounds
         self.binary_index_arr = binary_index_arr
         self.binary_results_arr = binary_results_arr
-        self.index_to_ml = {}
-        self.index_to_outcome = {}
+        self.index_to_ml = index_to_ml
+        self.index_to_outcome = index_to_outcome
 
         self.create_parlay_system()
 
@@ -34,7 +34,6 @@ class ParlaySystem():
         print('[ + , - ]: ', result)
         print(' pos/neg :', result[0] / result[1])
         print('toalt_dif: ', sum(result))
-
 
     def select_flattened_prop(self, prop):
         np_binaries = np.array(self.binaries)
@@ -79,8 +78,10 @@ class ParlaySystem():
         FinalVal= optimize.minimize(f, np.ones(len(self.all_parlays)), method='SLSQP', bounds=bnds, constraints=cons)
         print(FinalVal)
 
-        index_arrs = []
         events = []
+        index_arrs = []
+        results = []
+        event_status_arr = []
         bets = []
         multipliers = []
         payouts = []
@@ -90,20 +91,26 @@ class ParlaySystem():
             val = FinalVal.x[i]
             parlay = self.all_parlays[i]
             index_arr = [str(i) for i in parlay.index_arr]
+            result = [self.index_to_outcome[i] for i in parlay.index_arr]
+            event_status = result.count(1) == len(result)
             event = parlay.event
             multiplier = parlay.multiplier
             payout = val * parlay.multiplier
             profit = val * parlay.multiplier - sum(FinalVal.x)
 
             index_arrs.append(index_arr)
+            results.append(result)
+            event_status_arr.append(event_status)
             events.append(event)
             bets.append(round(val, 2))
             multipliers.append(multiplier)
             payouts.append(round(payout, 4))
             profits.append(round(profit, 2))
 
-        df = pd.DataFrame({'index_arr': index_arrs,
-                           'event': events,
+        df = pd.DataFrame({'event': events,
+                           'index_arr': index_arrs,
+                           'result': results,
+                           'event_status': event_status_arr,
                            'bet': bets,
                            'multiplier': multipliers,
                            'payout': payouts,
