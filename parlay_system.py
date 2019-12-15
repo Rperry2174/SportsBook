@@ -8,6 +8,30 @@ import statistics
 import scipy.optimize as optimize
 import inspect
 
+def color_negative_red(val):
+    """
+    Takes a scalar and returns a string with
+    the css property `'color: red'` for negative
+    strings, black otherwise.
+    """
+    if type(val) != bool:
+        return 'color: black'
+
+    color = 'red' if val == True else 'black'
+    return 'color: %s' % color
+
+def color_positive_green(val):
+    """
+    Takes a scalar and returns a string with
+    the css property `'color: red'` for negative
+    strings, black otherwise.
+    """
+    if type(val) != bool:
+        return 'color: black'
+
+    color = 'green' if val == True else 'black'
+    return 'color: %s' % color
+
 class ParlaySystem():
     def __init__(self, binaries, target_profit, bounds, binary_index_arr, binary_results_arr, index_to_ml={}, index_to_outcome={}):
         self.binaries = binaries
