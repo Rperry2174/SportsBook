@@ -79,6 +79,7 @@ class ParlaySystem():
         FinalVal= optimize.minimize(f, np.ones(len(self.all_parlays)), method='SLSQP', bounds=bnds, constraints=cons)
         print(FinalVal)
 
+        index_arrs = []
         events = []
         bets = []
         multipliers = []
@@ -88,18 +89,21 @@ class ParlaySystem():
         for i in range(len(FinalVal.x)):
             val = FinalVal.x[i]
             parlay = self.all_parlays[i]
+            index_arr = [str(i) for i in parlay.index_arr]
             event = parlay.event
             multiplier = parlay.multiplier
             payout = val * parlay.multiplier
             profit = val * parlay.multiplier - sum(FinalVal.x)
 
+            index_arrs.append(index_arr)
             events.append(event)
             bets.append(round(val, 2))
             multipliers.append(multiplier)
             payouts.append(round(payout, 4))
             profits.append(round(profit, 2))
 
-        df = pd.DataFrame({'event': events,
+        df = pd.DataFrame({'index_arr': index_arrs,
+                           'event': events,
                            'bet': bets,
                            'multiplier': multipliers,
                            'payout': payouts,
@@ -117,7 +121,7 @@ class ParlaySystem():
         print('std         : ', df["profit"].std())
         print(df.describe())
         self.print_parlay_odds_diff()
-        csv_data = [self.binary_index_arr, total_bet,df["profit"].mean(), df["profit"].std(), df["profit"].max(), df["profit"].min()]
+        csv_data = [index_arr, total_bet, df["profit"].mean(), df["profit"].std(), df["profit"].max(), df["profit"].min()]
         return csv_data, df
 
 

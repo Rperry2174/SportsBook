@@ -13,7 +13,7 @@ class MoneyLine():
 
     def set_index(self, new_index):
         self.index = new_index
-        
+
     def calculate_multiplier(self):
         if self.odds > 0:
             return 1 + (self.odds / 100.0)
@@ -37,6 +37,7 @@ class Parlay():
     def __init__(self, money_line_arr, bet_amount):
         self.money_line_arr = money_line_arr
         self.event = self.format_events()
+        self.index_arr = self.create_index_arr()
         self.bet_amount = bet_amount
         self.multiplier = self.calculate_multiplier()
         self.payout = self.calculate_payout()
@@ -52,6 +53,13 @@ class Parlay():
     # OFF BY ONE....
     def calculate_payout(self):
         return self.multiplier * self.bet_amount
+
+    def create_index_arr(self):
+        result = []
+        for ml in self.money_line_arr:
+            result.append(ml.index)
+
+        return result
 
     def format_events(self):
         result = ""
