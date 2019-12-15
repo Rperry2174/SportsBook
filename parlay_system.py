@@ -108,11 +108,11 @@ class ParlaySystem():
             profits.append(round(profit, 2))
 
         df = pd.DataFrame({'event': events,
-                           'index_arr': index_arrs,
+                           'index[]': index_arrs,
                            'result': results,
                            'event_status': event_status_arr,
                            'bet': bets,
-                           'multiplier': multipliers,
+                           'mult': multipliers,
                            'payout': payouts,
                            'profit': profits
                             })
