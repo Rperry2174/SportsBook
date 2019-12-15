@@ -116,7 +116,7 @@ class ParlaySystem():
                            'payout': payouts,
                            'profit': profits
                             })
-        df = df.sort_values(by=['profit'])
+        df = df.sort_values(by=['event_status', 'profit'], ascending=[False, False])
 
         total_bet = round(sum(bets), 2)
         print('slsqp_solver: ')
