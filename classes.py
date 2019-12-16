@@ -1,6 +1,7 @@
 import math
 import itertools
 import numpy as np
+import pandas as pd
 
 class MoneyLine():
     def __init__(self, event, bet_amount, odds):
@@ -25,13 +26,13 @@ class MoneyLine():
 
 
     def print_stats(self):
-        print("=========================")
-        print("event: ", self.event)
-        print("bet_amount: ", self.bet_amount)
-        print("odds: ", self.odds)
-        print("multiplier: ", self.multiplier)
-        print("payout:" , self.payout)
-        print("=========================")
+        df = pd.DataFrame({'event': [self.event],
+                           'bet_amount': [self.bet_amount],
+                           'odds': [self.odds],
+                           'multiplier': [self.multiplier],
+                           'payout': [self.payout]
+                           })
+        print(df)
 
 class Parlay():
     def __init__(self, money_line_arr, bet_amount):
@@ -66,7 +67,7 @@ class Parlay():
         for ml in self.money_line_arr:
             result += ml.event + "_"
 
-        return result
+        return result[:-1]
 
     def derive_odds(self):
         return 100.0 * ((self.payout / self.bet_amount) - 1.0)
@@ -76,13 +77,13 @@ class Parlay():
         return ",".join(items)
 
     def print_stats(self):
-        print("=========================")
-        print("event: ", self.event)
-        print("bet_amount: ", self.bet_amount)
-        print("odds: ", self.odds)
-        print("multiplier: ", self.multiplier)
-        print("payout:" , self.payout)
-        print("=========================")
+        df = pd.DataFrame({'event': [self.event],
+                           'bet_amount': [self.bet_amount],
+                           'odds': [self.odds],
+                           'multiplier': [self.multiplier],
+                           'payout': [self.payout]
+                           })
+        print(df)
 
 # ml = MoneyLine(event="broncos", bet_amount=10, odds=120)
 # ml.print_stats()
