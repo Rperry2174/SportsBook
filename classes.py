@@ -11,6 +11,7 @@ class MoneyLine():
         self.odds = odds
         self.multiplier = self.calculate_multiplier()
         self.payout = self.calculate_payout()
+        self.statistics = self.update_statistics()
 
     def set_index(self, new_index):
         self.index = new_index
@@ -20,6 +21,15 @@ class MoneyLine():
             return 1 + (self.odds / 100.0)
         else:
             return 1 + (100.0 / abs(self.odds))
+
+    def update_statistics(self):
+        return pd.DataFrame({
+            'event': [self.event],
+            'bet_amount': [self.bet_amount],
+            'odds': [self.odds],
+            'multiplier': [self.multiplier],
+            'payout': [self.payout]
+        })
 
     def calculate_payout(self):
         return self.multiplier * self.bet_amount
@@ -43,6 +53,8 @@ class Parlay():
         self.multiplier = self.calculate_multiplier()
         self.payout = self.calculate_payout()
         self.odds = self.derive_odds()
+        self.statistics = self.update_statistics()
+
 
     def calculate_multiplier(self):
         parlay_multiplier = 1
@@ -51,6 +63,14 @@ class Parlay():
 
         return parlay_multiplier
 
+    def update_statistics(self):
+        return pd.DataFrame({
+            'event': [self.event],
+            'bet_amount': [self.bet_amount],
+            'odds': [self.odds],
+            'multiplier': [self.multiplier],
+            'payout': [self.payout]
+        })
     # OFF BY ONE....
     def calculate_payout(self):
         return self.multiplier * self.bet_amount
