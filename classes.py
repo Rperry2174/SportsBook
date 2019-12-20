@@ -50,16 +50,11 @@ class Parlay():
         self.event = self.format_events()
         self.index_arr = self.create_index_arr()
         self.bet_amount = bet_amount
+        self.multiplier = self.calculate_multiplier()
+        self.payout = self.calculate_payout()
+        self.odds = self.derive_odds()
+        self.statistics = self.update_statistics()
 
-        self.multiplier = None
-        self.payout = None
-        self.odds = None
-        self.statistics = None
-
-        self.calculate_multiplier()
-        self.calculate_payout()
-        self.derive_odds()
-        self.update_statistics()
 
     def calculate_multiplier(self):
         parlay_multiplier = 1
