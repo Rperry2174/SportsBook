@@ -33,7 +33,7 @@ def color_positive_green(val):
     return 'color: %s' % color
 
 class ParlaySystem():
-    def __init__(self, binaries, target_profit, bounds, binary_index_arr, binary_results_arr, index_to_ml={}, index_to_outcome={}):
+    def __init__(self, binaries, target_profit, bounds, binary_index_arr, binary_results_arr, index_to_ml={}, index_to_outcome={}, override_arr=[]):
         self.binaries = binaries
         self.lp_variables = {}
         self.all_parlays = []
@@ -43,6 +43,7 @@ class ParlaySystem():
         self.binary_results_arr = binary_results_arr
         self.index_to_ml = index_to_ml
         self.index_to_outcome = index_to_outcome
+        self.override_arr = override_arr
 
         self.create_parlay_system()
 
@@ -77,7 +78,14 @@ class ParlaySystem():
                 parlay_name.append(money_line.event)
 
             globals()["_".join(parlay_name)] = Parlay(money_line_arr=parlay, bet_amount=1)
-            self.all_parlays.append(globals()["_".join(parlay_name)])
+
+            ### Handle an "override" situation given an index_arr that is to be overrided
+            current_parlay = globals()["_".join(parlay_name)]
+            if sorted(current_parlay.index_arr) == sorted(self.override_arr):
+                current_parlay.override_odds(105)
+                print("yooooo", current_parlay.event, current_parlay.index_arr, current_parlay.odds, current_parlay.multiplier)
+
+            self.all_parlays.append(current_parlay)
 
     def slsqp_solver(self):
 

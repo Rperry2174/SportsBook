@@ -6,6 +6,10 @@ bulls = MoneyLine(event="bulls", bet_amount=100, odds=200)
 mavericks = MoneyLine(event="mavericks", bet_amount=100, odds=525)
 rockets = MoneyLine(event="rockets", bet_amount=100, odds=-560)
 
+bulls.set_index(0)
+mavericks.set_index(1)
+rockets.set_index(2)
+
 assert bulls.odds == 200, "should be 200"
 assert bulls.multiplier == 3, "should be 3"
 assert bulls.payout == 300.0, "should be 300.0"
@@ -30,3 +34,5 @@ three_team_parlay.override_odds(200)
 assert three_team_parlay.odds == 200, "should be 200"
 assert three_team_parlay.multiplier == 3, "should be 3"
 assert three_team_parlay.payout == 300.0, "should be 300.0"
+
+print(three_team_parlay.index_arr)
