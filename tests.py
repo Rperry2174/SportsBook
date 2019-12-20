@@ -25,3 +25,8 @@ three_team_parlay = Parlay(
 assert round(three_team_parlay.odds, 2) == 2109.82, "should be 2109.82"
 assert round(three_team_parlay.multiplier, 2) == 22.10, "should be 22.10"
 assert round(three_team_parlay.payout, 2) == 2209.82, "should be 2209.82"
+
+three_team_parlay.override_odds(200)
+assert three_team_parlay.odds == 200, "should be 200"
+assert three_team_parlay.multiplier == 3, "should be 3"
+assert three_team_parlay.payout == 300.0, "should be 300.0"
