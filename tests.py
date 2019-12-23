@@ -36,3 +36,7 @@ assert three_team_parlay.multiplier == 3, "should be 3"
 assert three_team_parlay.payout == 300.0, "should be 300.0"
 
 print(three_team_parlay.index_arr)
+three_team_parlay.update_bet_amount(200)
+assert three_team_parlay.odds == 200, "should be 200"
+assert three_team_parlay.multiplier == 3, "should be 3"
+assert three_team_parlay.payout == 600.0, "should be 600.0"
