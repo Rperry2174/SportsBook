@@ -79,7 +79,7 @@ class Parlay():
         self.odds = new_odds
         self.multiplier = self.odds_to_multiplier()
         self.payout = self.multiplier_to_payout()
-        
+
     def create_index_arr(self):
         result = []
         for ml in self.money_line_arr:

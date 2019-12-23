@@ -81,9 +81,9 @@ class ParlaySystem():
 
             ### Handle an "override" situation given an index_arr that is to be overrided
             current_parlay = globals()["_".join(parlay_name)]
-            if sorted(current_parlay.index_arr) == sorted(self.override_arr):
-                current_parlay.override_odds(105)
-                print("yooooo", current_parlay.event, current_parlay.index_arr, current_parlay.odds, current_parlay.multiplier)
+            # if sorted(current_parlay.index_arr) == sorted(self.override_arr):
+            #     current_parlay.override_odds(1520)
+            #     print("yooooo", current_parlay.event, current_parlay.index_arr, current_parlay.odds, current_parlay.multiplier)
 
             self.all_parlays.append(current_parlay)
 
@@ -104,7 +104,7 @@ class ParlaySystem():
         for i in range(len(self.all_parlays)):
             bnds += (self.bounds,)
 
-        cons = [{'type': 'ineq', 'fun': lambda x, i=i : x[i] * self.all_parlays[i].multiplier - sum(x) - self.target_profit } for i in range(len(self.all_parlays))]
+        cons = [{'type': 'ineq', 'fun': lambda x, i=i : x[i] * self.all_parlays[i].multiplier - self.target_profit - sum(x) } for i in range(len(self.all_parlays))]
 
         # COBYLA doesn't support bounds in this format
         FinalVal= optimize.minimize(f, np.ones(len(self.all_parlays)), method='SLSQP', bounds=bnds, constraints=cons)
@@ -114,6 +114,7 @@ class ParlaySystem():
         index_arrs = []
         results = []
         event_status_arr = []
+        odds = []
         bets = []
         multipliers = []
         payouts = []
@@ -133,16 +134,18 @@ class ParlaySystem():
             index_arrs.append(index_arr)
             results.append(result)
             event_status_arr.append(event_status)
+            odds.append(parlay.odds)
             events.append(event)
-            bets.append(round(val, 2))
+            bets.append(round(val, 3))
             multipliers.append(multiplier)
             payouts.append(round(payout, 4))
-            profits.append(round(profit, 2))
+            profits.append(round(profit, 3))
 
         df = pd.DataFrame({'event': events,
                            'index[]': index_arrs,
                            'result': results,
                            'event_status': event_status_arr,
+                           'odds': odds,
                            'bet': bets,
                            'mult': multipliers,
                            'payout': payouts,
