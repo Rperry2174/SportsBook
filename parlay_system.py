@@ -121,22 +121,25 @@ class ParlaySystem():
         profits = []
 
         for i in range(len(FinalVal.x)):
-            val = FinalVal.x[i]
+            solver_bet_amount = FinalVal.x[i]
+
             parlay = self.all_parlays[i]
+            parlay.update_bet_amount(solver_bet_amount)
+
             index_arr = [str(i) for i in parlay.index_arr]
             result = [self.index_to_outcome[i] for i in parlay.index_arr]
             event_status = result.count(1) == len(result)
             event = parlay.event
             multiplier = parlay.multiplier
-            payout = val * parlay.multiplier
-            profit = val * parlay.multiplier - sum(FinalVal.x)
+            payout = parlay.payout
+            profit = parlay.bet_amount * parlay.multiplier - sum(FinalVal.x)
 
             index_arrs.append(index_arr)
             results.append(result)
             event_status_arr.append(event_status)
             odds.append(parlay.odds)
             events.append(event)
-            bets.append(round(val, 3))
+            bets.append(round(parlay.bet_amount, 3))
             multipliers.append(multiplier)
             payouts.append(round(payout, 4))
             profits.append(round(profit, 3))
