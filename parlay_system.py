@@ -33,7 +33,7 @@ def color_positive_green(val):
     return 'color: %s' % color
 
 class ParlaySystem():
-    def __init__(self, binaries, target_profit, bounds, binary_index_arr, binary_results_arr, index_to_ml={}, index_to_outcome={}):
+    def __init__(self, binaries, target_profit, bounds, binary_index_arr, binary_results_arr, index_to_ml={}, index_to_outcome={}, override_arr=[]):
         self.binaries = binaries
         self.lp_variables = {}
         self.all_parlays = []
@@ -43,6 +43,7 @@ class ParlaySystem():
         self.binary_results_arr = binary_results_arr
         self.index_to_ml = index_to_ml
         self.index_to_outcome = index_to_outcome
+        self.override_arr = override_arr
 
         self.create_parlay_system()
 
@@ -56,7 +57,7 @@ class ParlaySystem():
                     result[1] += ml.odds
 
         print('[ + , - ]: ', result)
-        print(' pos/neg :', result[0] / result[1])
+        # print(' pos/neg :', result[0] / result[1])
         print('toalt_dif: ', sum(result))
 
     def select_flattened_prop(self, prop):
@@ -65,8 +66,7 @@ class ParlaySystem():
         return [getattr(bin, prop) for bin in np_binaries]
 
     def create_parlay_system(self):
-        lst = list(itertools.product([0, 1], repeat=len(self.binaries)))
-
+        lst = list(itertools.product([i for i in range(len(self.binaries[0]))], repeat=len(self.binaries)))
         for tuple in lst:
             parlay = []
             parlay_name = []
@@ -77,7 +77,14 @@ class ParlaySystem():
                 parlay_name.append(money_line.event)
 
             globals()["_".join(parlay_name)] = Parlay(money_line_arr=parlay, bet_amount=1)
-            self.all_parlays.append(globals()["_".join(parlay_name)])
+
+            ### Handle an "override" situation given an index_arr that is to be overrided
+            current_parlay = globals()["_".join(parlay_name)]
+            # if sorted(current_parlay.index_arr) == sorted(self.override_arr):
+            #     current_parlay.override_odds(1520)
+            #     print("yooooo", current_parlay.event, current_parlay.index_arr, current_parlay.odds, current_parlay.multiplier)
+
+            self.all_parlays.append(current_parlay)
 
     def slsqp_solver(self):
 
@@ -86,7 +93,8 @@ class ParlaySystem():
 
             for i in range(len(x)):
                 parlay = self.all_parlays[i]
-                profit = (x[i] * parlay.multiplier + x[i]) - sum(x)
+                parlay.update_bet_amount(x[i])
+                profit = parlay.payout - sum(x)
                 parlay_profits.append(profit)
 
             # print("statistics.mean(parlay_profits): ", statistics.mean(parlay_profits))
@@ -96,7 +104,7 @@ class ParlaySystem():
         for i in range(len(self.all_parlays)):
             bnds += (self.bounds,)
 
-        cons = [{'type': 'ineq', 'fun': lambda x, i=i : x[i] * self.all_parlays[i].multiplier - sum(x) - self.target_profit } for i in range(len(self.all_parlays))]
+        cons = [{'type': 'ineq', 'fun': lambda x, i=i : x[i] * self.all_parlays[i].multiplier - self.target_profit - sum(x) } for i in range(len(self.all_parlays))]
 
         # COBYLA doesn't support bounds in this format
         FinalVal= optimize.minimize(f, np.ones(len(self.all_parlays)), method='SLSQP', bounds=bnds, constraints=cons)
@@ -106,41 +114,47 @@ class ParlaySystem():
         index_arrs = []
         results = []
         event_status_arr = []
+        odds = []
         bets = []
         multipliers = []
         payouts = []
         profits = []
 
         for i in range(len(FinalVal.x)):
-            val = FinalVal.x[i]
+            solver_bet_amount = FinalVal.x[i]
+
             parlay = self.all_parlays[i]
+            parlay.update_bet_amount(solver_bet_amount)
+
             index_arr = [str(i) for i in parlay.index_arr]
             result = [self.index_to_outcome[i] for i in parlay.index_arr]
             event_status = result.count(1) == len(result)
             event = parlay.event
             multiplier = parlay.multiplier
-            payout = val * parlay.multiplier
-            profit = val * parlay.multiplier - sum(FinalVal.x)
+            payout = parlay.payout
+            profit = parlay.bet_amount * parlay.multiplier - sum(FinalVal.x)
 
             index_arrs.append(index_arr)
             results.append(result)
             event_status_arr.append(event_status)
+            odds.append(parlay.odds)
             events.append(event)
-            bets.append(round(val, 2))
+            bets.append(round(parlay.bet_amount, 4))
             multipliers.append(multiplier)
             payouts.append(round(payout, 4))
-            profits.append(round(profit, 2))
+            profits.append(round(profit, 3))
 
         df = pd.DataFrame({'event': events,
                            'index[]': index_arrs,
                            'result': results,
-                           'event_status': event_status_arr,
+                           'ev_stat': event_status_arr,
+                           'odds': odds,
                            'bet': bets,
                            'mult': multipliers,
                            'payout': payouts,
                            'profit': profits
                             })
-        df = df.sort_values(by=['event_status', 'profit'], ascending=[False, False])
+        df = df.sort_values(by=['ev_stat', 'profit'], ascending=[False, False])
 
         total_bet = round(sum(bets), 2)
         print('slsqp_solver: ')

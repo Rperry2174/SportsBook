@@ -55,6 +55,11 @@ class Parlay():
         self.odds = self.payout_to_odds()
         self.statistics = self.update_statistics()
 
+    def update_bet_amount(self, new_bet_amount):
+        self.bet_amount = new_bet_amount
+        self.payout = self.multiplier_to_payout()
+        self.odds = self.payout_to_odds()
+        self.statistics = self.update_statistics()
 
     def ml_arr_to_multiplier(self):
         parlay_multiplier = 1
@@ -79,7 +84,7 @@ class Parlay():
         self.odds = new_odds
         self.multiplier = self.odds_to_multiplier()
         self.payout = self.multiplier_to_payout()
-        
+
     def create_index_arr(self):
         result = []
         for ml in self.money_line_arr:
